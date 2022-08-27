@@ -2,30 +2,22 @@
 require("dotenv").config();
 const debug = require("debug")("app");
 const morgan = require("morgan");
-const helmet = require("helmet");
 const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 
 // debug(process.env);
-
-// Import Routers
-const productsRouter = require("./routes/products");
-const suppliersRouter = require("./routes/suppliers");
-const usersRouter = require("./routes/users");
-const walletsRouter = require("./routes/wallets");
+const auth = require("./middlewares/auth");
+const upload = require("./middlewares/upload");
+const { registerUser, loginUser } = require("./controllers/user");
+const { create, findById, findAll } = require("./controllers/product");
+const { buy, ship } = require("./controllers/invoice");
 
 // Use middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
-app.use(helmet());
-
-// Use router middlewares
-app.use("/api/products", productsRouter);
-app.use("/api/suppliers", suppliersRouter);
-app.use("/api/users", usersRouter);
-app.use("/api/wallets", walletsRouter);
+// app.use(helmet());
 
 if (app.get("env") === "development") {
   app.use(morgan("dev"));
@@ -44,7 +36,16 @@ mongoose.connect(
   }
 );
 
+app.post("/login", loginUser);
+app.post("/register", registerUser);
+
+app.get("/products", findAll);
+app.post("/products", [auth, upload.single("image"), create]);
+app.post("/buy", buy);
+app.post("/ship", ship);
+
 const port = process.env.PORT || 3000;
+
 app.listen(port, () => {
   debug(`Listening on http://localhost:${port}`);
 });

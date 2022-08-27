@@ -1,1 +1,0 @@
-const Supplier = require('../models/supplier');
