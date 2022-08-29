@@ -1,6 +1,21 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { Products, Navbar, Cart, Checkout, Login, Signup, Profile } from './components';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import {
+  Products,
+  Navbar,
+  Cart,
+  Checkout,
+  Login,
+  Signup,
+  Profile,
+} from "./components";
+
+import { useAuthContext } from "./hooks/useAuthContext";
 
 // var Cart={
 //     items:[],
@@ -19,38 +34,34 @@ import { Products, Navbar, Cart, Checkout, Login, Signup, Profile } from './comp
 //     { id:4, name:'Wireless Mouse',img:"", brand:"Logitech", supplier:'SylhetShop', description:'it is wireless mouse.', price:'$10'}
 // ]
 
- const App = () => {
-     return(
-         <Router>
-            <div>
-                
-                <Switch>
-                    <Route exact path='/'>
-                        <Navbar/>
-                        <Products/>
-                    </Route>
-                    <Route exact path='/cart'>
-                        <Navbar/>
-                        <Cart/> 
-                    </Route>
-                    <Route exact path='/checkOut'>
-                        <Navbar/>
-                        <Checkout/> 
-                    </Route>
-                    <Route exact path='/logIn'>
-                        <Login/> 
-                    </Route>
-                    <Route exact path='/signUp'>
-                        <Signup/> 
-                    </Route>
-                    <Route exact path='/profile'>
-                        <Navbar/>
-                        <Profile/>
-                    </Route>
-                </Switch> 
-            </div>
-         </Router>
-        
-     )
- }
- export default App;
+const App = () => {
+  const { user } = useAuthContext();
+
+  return (
+    <Router>
+      <div>
+        <Switch>
+          <Route exact path="/">
+            {user ? <Products /> : <Redirect to="/login" />}
+          </Route>
+          <Route exact path="/cart">
+            <Cart />
+          </Route>
+          <Route exact path="/checkout">
+            <Checkout />
+          </Route>
+          <Route exact path="/login">
+            {!user ? <Login /> : <Redirect to="/" />}
+          </Route>
+          <Route exact path="/signup">
+            {!user ? <Signup /> : <Redirect to="/" />}
+          </Route>
+          <Route exact path="/profile">
+            <Profile />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
+};
+export default App;

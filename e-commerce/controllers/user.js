@@ -1,10 +1,13 @@
+const fetch = require("node-fetch");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 const User = require("../models/user");
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, account, secret } = req.body;
+
+    console.log(req.body);
 
     let user = await User.findOne({ email: email }).exec();
 
@@ -21,18 +24,20 @@ const registerUser = async (req, res) => {
       name: name,
       email: email,
       password: hashedPassword,
+      bank_cred: {
+        account_no: account,
+        password: secret,
+      },
     });
 
     await user.save();
 
     const token = user.generateToken();
 
-    console.info(`User created ${user}`);
-
-    return res
-      .header("x-auth-token", token)
-      .status(201)
-      .json(_.pick(user, ["_id", "name", "email"]));
+    return res.status(201).json({
+      ..._.pick(user, ["_id", "name", "email", "account", "secret"]),
+      token: token,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -61,12 +66,27 @@ const loginUser = async (req, res) => {
 
     const token = user.generateToken();
 
-    console.log("token: " + token);
+    if (user.bank_cred) {
+      const response = await fetch("http://127.0.0.1:4001/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: user.bank_cred.account_no,
+          password: user.bank_cred.password,
+        }),
+      });
 
-    return res
-      .header("x-auth-token", token)
-      .status(201)
-      .json(_.pick(user, ["_id", "name", "email"]));
+      const { balance } = await response.json();
+
+      console.log({ balance });
+
+      user.balance = balance;
+    }
+
+    return res.status(201).json({
+      ..._.pick(user, ["_id", "name", "email", "bank_cred", "balance"]),
+      token: token,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -130,7 +150,92 @@ const updateCart = async (req, res) => {
   }
 };
 
+const addProduct = async (req, res) => {
+  try {
+    let { product_id, price } = req.body;
+    price = parseFloat(price);
+    const _id = req.user._id;
+    let user = await User.findOne({ _id }).exec();
+
+    if (!user) {
+      res.status(404).json(`user with id: ${_id} not found`);
+    }
+
+    const index = user.cart.findIndex((item) => item.product_id === product_id);
+
+    if (index === -1) {
+      user = await User.findOneAndUpdate(
+        { _id: _id },
+        {
+          $push: { cart: { product_id: product_id, price: price, unit: 1 } },
+        },
+        {
+          new: true,
+        }
+      ).exec();
+    } else {
+      user = await User.findOneAndUpdate(
+        { _id: _id, "cart.product_id": product_id },
+        {
+          $inc: { "cart.$.unit": 1 },
+        },
+        {
+          new: true,
+        }
+      ).exec();
+    }
+
+    return res.status(200).json({ cart: user.cart });
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
+
+const removeProduct = async (req, res) => {
+  try {
+    const { product_id } = req.body;
+    const _id = req.user._id;
+    let user = await User.findOne({ _id }).exec();
+
+    if (!user) {
+      res.status(404).json(`user with id: ${_id} not found`);
+    }
+
+    const index = user.cart.findIndex((item) => item.product_id === product_id);
+
+    if (index !== -1) {
+      if (user.cart[index].unit === 1) {
+        user = await User.findOneAndUpdate(
+          { _id: _id },
+          {
+            $pull: { cart: { product_id: product_id } },
+          },
+          {
+            new: true,
+          }
+        ).exec();
+      } else {
+        user = await User.findOneAndUpdate(
+          { _id: _id, "cart.product_id": product_id },
+          {
+            $inc: { "cart.$.unit": -1 },
+          },
+          {
+            new: true,
+          }
+        ).exec();
+      }
+    }
+
+    return res.status(200).json({ cart: user.cart });
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
+
 exports.loginUser = loginUser;
 exports.registerUser = registerUser;
 exports.addBankInfo = addBankInfo;
 exports.updateCart = updateCart;
+exports.addProduct = addProduct;
+exports.removeProduct = removeProduct;

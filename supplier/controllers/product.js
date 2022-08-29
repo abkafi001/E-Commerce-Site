@@ -59,7 +59,9 @@ const findById = async (req, res) => {
 
 const findAll = async (req, res) => {
   try {
-    const products = await Product.find({}).exec();
+    const products = await Product.find({})
+      .populate("supplier", ["name", "email"])
+      .exec();
     return res.status(200).json({ products: products });
   } catch (err) {
     console.error(err);

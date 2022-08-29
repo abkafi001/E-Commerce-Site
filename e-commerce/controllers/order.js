@@ -39,6 +39,8 @@ const create = async (req, res) => {
       }),
     });
 
+    const actual_response = await response.json();
+
     return res.status(200).json(await response.json());
   } catch (err) {
     console.error(err);

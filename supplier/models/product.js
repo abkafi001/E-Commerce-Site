@@ -13,7 +13,7 @@ module.exports = mongoose.model(
       supplier: {
         type: mongoose.Schema.Types.ObjectID,
         required: true,
-        ref: "Supplier",
+        ref: "User",
       },
       description: {
         type: String,

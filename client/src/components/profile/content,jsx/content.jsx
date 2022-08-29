@@ -1,12 +1,17 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import { Link } from 'react-router-dom';
 import { Grid, List, ListItem, ListItemText, Card, CardHeader, CardMedia, CardContent, CardActions, Typography ,Button,  Container  } from '@material-ui/core';
 import {AddShoppingCart , AccountCircle} from '@material-ui/icons';
 import makeStyles from './style';
 import logo from '../../../assets/profileLogo.png';
 
+import { useAuthContext } from '../../../hooks/useAuthContext';
 
-const Content=(person)=>{
+const Content=()=>{
     const classes=makeStyles();
+
+    const { user } = useAuthContext();
+
     return(
         <> 
             <Grid
@@ -23,28 +28,40 @@ const Content=(person)=>{
                     <List>
                         <ListItem style={{ padding: '10px 0' }}>
                             <ListItemText primary={"Customer Name :"} />
-                            <Typography variant="body2">Sukanto Kumar Das</Typography>
+                            <Typography variant="body2">{ user && user.name }</Typography>
                         </ListItem>
                         <ListItem style={{ padding: '5px 0' }}>
-                            <ListItemText primary={"User Name :"} />
-                            <Typography variant="body2">Debasish91</Typography>
+                            <ListItemText primary={"Email :"} />
+                            <Typography variant="body2">{ user && user.email }</Typography>
                         </ListItem>
-                        <ListItem style={{ padding: '5px 0' }}>
+                        {/* <ListItem style={{ padding: '5px 0' }}>
                             <ListItemText primary={"Password :"} />
                             <Typography variant="body2">12345678</Typography>
-                        </ListItem>
+                        </ListItem> */}
                         <ListItem style={{ padding: '5px 0' }}>
                             <ListItemText primary={"Bank Account :"} />
-                            <Typography variant="body2">2017331091</Typography>
+                            <Typography variant="body2">
+                                { user && user.bank_cred.account_no}
+                            </Typography>
                         </ListItem>
                         <ListItem style={{ padding: '20px 0' }}>
                             <ListItemText primary={"Balance :"} />
-                            <Typography variant="h6">10,000$</Typography>
+                            <Typography variant="h6">
+                                {user && user.balance}$
+                            </Typography>
                         </ListItem>
                     </List>
                 </CardContent>
                 <CardActions alaignItem='center'>
-                    <Button variant="contained" type="button" color="secondary" >Back</Button>
+                    <Button 
+                        component = {Link} 
+                        to = "/"
+                        variant="contained" 
+                        type="button" 
+                        color="secondary" 
+                    >
+                        Back
+                    </Button>
                 </CardActions>
             </Card>
             </Grid>

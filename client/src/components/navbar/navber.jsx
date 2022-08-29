@@ -1,13 +1,26 @@
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Badge, ManuItem, Manu, Typography } from '@material-ui/core';
 import { ShoppingCart , AccountCircle} from '@material-ui/icons';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import logo from '../../assets/dokan.png';
 import useStyles from './styles';
 import {Link , useLocation } from 'react-router-dom';
 import { Button } from 'semantic-ui-react';
+
+import { useAuthContext } from '../../hooks/useAuthContext';
+import { useLogout } from "../../hooks/useLogout"
+
+
 const Navbar = () => {
     const classes=useStyles();
     const location = useLocation();
+    const { user } = useAuthContext();
+    const { logout } = useLogout();
+
+    const handleClick = (e) => {
+        logout();
+    };
+
     return(
         <>
         <AppBar position='fixed' className={classes.appBar} >
@@ -43,6 +56,13 @@ const Navbar = () => {
                             <ShoppingCart/>
                         </Badge>
                     </IconButton>)}
+                </div>
+                <div className={classes.button} onClick={handleClick}>
+                    {(location.pathname ==='/') && 
+                    (<Typography component={Link} to='/login' varient='h6' className={classes.title} color='inherit'>
+                        Logout
+                        <ExitToAppIcon />
+                    </Typography>)}
                 </div>
                 
             </Toolbar>

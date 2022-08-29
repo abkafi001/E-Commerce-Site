@@ -27,12 +27,10 @@ const registerUser = async (req, res) => {
 
     const token = user.generateToken();
 
-    console.info(`User created ${user}`);
-
-    return res
-      .header("x-auth-token", token)
-      .status(201)
-      .json(_.pick(user, ["_id", "email", "balance"]));
+    return res.status(201).json({
+      ..._.pick(user, ["_id", "email", "balance"]),
+      token: token,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -61,12 +59,10 @@ const loginUser = async (req, res) => {
 
     const token = user.generateToken();
 
-    console.log("token: " + token);
-
-    return res
-      .header("x-auth-token", token)
-      .status(201)
-      .json(_.pick(user, ["_id", "email", "balance"]));
+    return res.status(201).json({
+      ..._.pick(user, ["_id", "email", "balance"]),
+      token: token,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -134,14 +130,12 @@ const transferTo = async (req, res) => {
 
     transaction.save();
 
-    return res
-      .status(200)
-      .json({
-        txId: transaction._id,
-        from: sender._id,
-        to: receiver._id,
-        ammount: ammount,
-      });
+    return res.status(200).json({
+      txId: transaction._id,
+      from: sender._id,
+      to: receiver._id,
+      ammount: ammount,
+    });
   } catch (err) {
     console.error(err);
     return res.status(400).json({ error: err.message });

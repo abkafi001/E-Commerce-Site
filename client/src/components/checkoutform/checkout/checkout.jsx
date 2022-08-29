@@ -4,6 +4,7 @@ import { Link, useHistory } from 'react-router-dom';
 
 import AddressForm from '../AddressForm';
 import PaymentForm from '../PaymentForm';
+import Navbar from '../../navbar/navber';
 import useStyles from './styles';
 
 const steps = ['Shipping address', 'Payment details'];
@@ -36,6 +37,7 @@ const Form = () => (activeStep === 0
 
 return (
   <>
+    <Navbar />
     <CssBaseline />
     <div className={classes.toolbar} />
     <main className={classes.layout}>
