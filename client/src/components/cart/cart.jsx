@@ -30,31 +30,38 @@ const Cart = () => {
         <>
             <Grid container justify="center" spacing={3} >
                 {cart && cart.map((item)=>(
-                    <Grid item key={item.id} xs={12} sm={4} >
-                        <CartItem item={item}/>
+                    <Grid item key={item.product_id} xs={12} sm={4} >
+                        <CartItem item={item} />
                     </Grid>
                     
                 ))}
             </Grid>
 
             <div className={classes.cardDetails}>
-                <Typography variant='h4' > Subtotal:{"$23"}</Typography>
+                <Typography variant='h4' > 
+                    Subtotal: {cart.reduce((subtotal, item) =>  subtotal = subtotal + (Number(item.unit)*Number(item.price)), 0 ).toFixed(2)}
+                </Typography>
                 <div>
-                    <Button className={classes.emptyButton} variant="contained" type="button" color="secondary" size='large' >Empty Card</Button>
+                    {/* <Button className={classes.emptyButton} variant="contained" type="button" color="secondary" size='large' >Empty Card</Button> */}
                     <Button component={Link} to="/checkout" className={classes.checkoutButton} variant="contained" type="button" color="primary" size='large' >Check Out</Button>
                 </div>
             </div>
         </>
     );
+
     return(
-        <Container>
+
+        <main className={classes.content}>
             <Navbar/>
-            <div className={classes.toolbar} />
-            <Typography className={classes.title} variant='h3'>
-                Your Shoping Cart
-            </Typography>
-            {isEmpty ? <EmptyCard/> :<FilledCard/>}
-        </Container>
+            <Container>
+                
+                <div className={classes.toolbar} />
+                <Typography className={classes.title} variant='h3'>
+                    Your Shoping Cart
+                </Typography>
+                {isEmpty ? <EmptyCard/> :<FilledCard/>}
+            </Container>
+        </main>
     );
 }
 

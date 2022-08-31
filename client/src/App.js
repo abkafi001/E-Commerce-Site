@@ -45,10 +45,10 @@ const App = () => {
             {user ? <Products /> : <Redirect to="/login" />}
           </Route>
           <Route exact path="/cart">
-            <Cart />
+            {user ? <Cart /> : <Redirect to="/login" />}
           </Route>
           <Route exact path="/checkout">
-            <Checkout />
+            {user ? <Checkout /> : <Redirect to="/login" />}
           </Route>
           <Route exact path="/login">
             {!user ? <Login /> : <Redirect to="/" />}
@@ -57,7 +57,7 @@ const App = () => {
             {!user ? <Signup /> : <Redirect to="/" />}
           </Route>
           <Route exact path="/profile">
-            <Profile />
+            {user ? <Profile /> : <Redirect to="/login" />}
           </Route>
         </Switch>
       </div>

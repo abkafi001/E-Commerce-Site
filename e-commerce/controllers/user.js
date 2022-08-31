@@ -124,6 +124,21 @@ const addBankInfo = async (req, res) => {
   }
 };
 
+const getCart = async (req, res) => {
+  try {
+    const _id = req.user._id;
+    const user = await User.findOne({ _id }).exec();
+
+    if (!user) {
+      res.status(404).json(`user with id: ${_id} not found`);
+    }
+
+    return res.status(200).json(user.cart);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
+
 const updateCart = async (req, res) => {
   try {
     const { cart } = req.body;
@@ -236,6 +251,7 @@ const removeProduct = async (req, res) => {
 exports.loginUser = loginUser;
 exports.registerUser = registerUser;
 exports.addBankInfo = addBankInfo;
+exports.getCart = getCart;
 exports.updateCart = updateCart;
 exports.addProduct = addProduct;
 exports.removeProduct = removeProduct;

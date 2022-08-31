@@ -40,6 +40,7 @@ app.post("/login", loginUser);
 app.post("/register", registerUser);
 
 app.get("/products", findAll);
+app.get("/products/:id", findById);
 app.post("/products", [auth, upload.single("image"), create]);
 app.post("/buy", buy);
 app.post("/ship", ship);

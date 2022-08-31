@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, IconButton, Badge, ManuItem, Manu, Typography } from '@material-ui/core';
 import { ShoppingCart , AccountCircle} from '@material-ui/icons';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -8,14 +8,52 @@ import {Link , useLocation } from 'react-router-dom';
 import { Button } from 'semantic-ui-react';
 
 import { useAuthContext } from '../../hooks/useAuthContext';
+import { useCartContext } from '../../hooks/useCartContext';
 import { useLogout } from "../../hooks/useLogout"
 
 
 const Navbar = () => {
     const classes=useStyles();
+
     const location = useLocation();
     const { user } = useAuthContext();
+    const { cart, dispatch } = useCartContext();
     const { logout } = useLogout();
+    const [ counter, setCounter ] = useState(0);
+
+    useEffect(() => {
+        const fetchCart = async () => {
+            const response = await fetch('http://localhost:3001/api/users/cart', {
+                headers: {
+                    'x-auth-token': user.token,
+                    'contentType': 'application/json'
+                },
+            })
+
+            const json = await response.json()
+        
+            if (response.ok) {
+                // console.log("cart: "+ JSON.stringify(json));
+                dispatch({type: 'SET_CART', payload: json });
+            }
+        }
+        
+        if (user) {
+            fetchCart();
+        }
+    }, [dispatch, user])
+
+    useEffect(() => {
+
+        if(cart){
+
+            let cnt = 0;
+            for (const item of cart) {
+                cnt += item.unit;
+            }
+            setCounter(cnt);
+        }
+    }, [user, cart])
 
     const handleClick = (e) => {
         logout();
@@ -52,7 +90,9 @@ const Navbar = () => {
                 <div className={classes.button}>
                     {(location.pathname ==='/') && 
                     (<IconButton component={Link} to='/cart' aria-label="Show" >
-                        <Badge badgeContent={2} color="secondary">
+                        <Badge 
+                        badgeContent={counter} 
+                        color="secondary">
                             <ShoppingCart/>
                         </Badge>
                     </IconButton>)}
@@ -70,4 +110,5 @@ const Navbar = () => {
         </>
     )
 };
+
 export default Navbar;

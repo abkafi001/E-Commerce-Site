@@ -12,43 +12,40 @@ export const cartReducer = (state, action) => {
       };
 
     case "ADD":
+      // console.log("context: " + Array.isArray(action.payload instanceof Array));
+      // console.log("cart: " + Array.isArray(state.cart));
+      // console.log(JSON.stringify(action.payload));
       index = state.cart.findIndex(
-        (item) => item.product_id === action.payload.product_id
+        (item) => item.product_id === action.payload
       );
 
-      if (index === -1) {
-        return {
-          cart: [...state.cart, { ...action.payload, unit: 1 }],
-        };
-      } else {
-        state.cart[index].unit += 1;
-        return {
-          cart: state.cart,
-        };
-      }
+      // console.log(state.cart.length);
+      // console.log({ index });
+
+      state.cart[index].unit += 1;
+
+      return {
+        cart: state.cart,
+      };
 
     case "REMOVE":
-      index = state.cart.findIndex(
-        (item) => item.product_id === action.payload.product_id
-      );
+      console.log(JSON.stringify(action.payload));
+      const cart = state.cart;
+      console.log("cart: " + JSON.stringify(cart));
 
-      if (index === -1) {
+      index = cart.findIndex((item) => item.product_id === action.payload);
+      console.log(index);
+      console.log("unit: " + cart[index].unit);
+
+      if (cart[index].unit === 1) {
+        return {
+          cart: cart.filter((item) => item.product_id !== action.payload),
+        };
+      } else {
+        state.cart[index].unit -= 1;
         return {
           cart: state.cart,
         };
-      } else {
-        if (state.cart[index].unit === 1) {
-          return {
-            cart: state.cart.filter(
-              (item) => item.product_id !== action.payload.product_id
-            ),
-          };
-        } else {
-          state.cart[index].unit -= 1;
-          return {
-            cart: state.cart,
-          };
-        }
       }
 
     default:

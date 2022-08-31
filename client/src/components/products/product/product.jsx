@@ -5,15 +5,16 @@ import {AddShoppingCart} from '@material-ui/icons';
 import useStyles from './style'
 
 import { useAuthContext } from '../../../hooks/useAuthContext';
+import { useCartContext } from '../../../hooks/useCartContext';
 
 const Product=({product})=>{
     const classes=useStyles();
 
-
+    const { dispatch } = useCartContext();
     const { user } = useAuthContext();
 
     const handleClick = async (e) => {
-        console.log(product)
+        // console.log(product)
 
         const response = await fetch("http://127.0.0.1:3001/api/users/add-product", 
         {
@@ -31,8 +32,7 @@ const Product=({product})=>{
 
         const json = await response.json();
 
-        console.log("returned: "+ json)
-
+        dispatch({type: 'SET_CART', payload: json.cart});
 
     }
     

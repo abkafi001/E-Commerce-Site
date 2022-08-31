@@ -6,10 +6,10 @@ const create = async (req, res) => {
     const { name, description, category, price, unit } = req.body;
     const supplier = req.user._id;
 
-    console.log(supplier);
-    console.log(req.user._id);
-    console.log("body: " + JSON.stringify(req.body));
-    console.log(`path: ${req.file.path}`);
+    // console.log(supplier);
+    // console.log(req.user._id);
+    // console.log("body: " + JSON.stringify(req.body));
+    // console.log(`path: ${req.file.path}`);
 
     const image = fs.readFileSync(req.file.path);
     var encoded_image = image.toString("base64");
@@ -47,9 +47,12 @@ const create = async (req, res) => {
 
 const findById = async (req, res) => {
   try {
-    const { id } = req.params;
-    console.log(id);
+    // console.log(req.params);
+    const id = req.params.id;
+
     const product = await Product.findById(id).exec();
+
+    // console.log({ product });
     return res.status(200).json({ product: product });
   } catch (err) {
     console.error(err);
